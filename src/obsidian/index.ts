@@ -49,12 +49,15 @@ export class Obsidian {
       body?: string;
     },
   ): Promise<T> {
-    // biome-ignore lint/suspicious/noConsole: <explanation>
+    const finalHeaders = { ...this.headers, ...headers };
+
     console.error(`[${method}] ${this.baseUrl}${path}`);
+    console.error(`Headers:`, JSON.stringify(finalHeaders, null, 2));
+    console.error(`Body:`, body);
 
     const response = await fetch(`${this.baseUrl}${path}`, {
       method: method,
-      headers: { ...this.headers, ...headers },
+      headers: finalHeaders,
       body,
     });
 
@@ -63,7 +66,9 @@ export class Obsidian {
       let parsedError: ErrorResponse | null = null;
       try {
         parsedError = (await response.json()) as ErrorResponse;
+        console.error(`Error response:`, JSON.stringify(parsedError, null, 2));
       } catch {
+        console.error(`Failed to parse error response`);
         throw new Error(`Error: ${statusText} (${status})`);
       }
       throw new Error(
@@ -71,7 +76,21 @@ export class Obsidian {
       );
     }
 
-    return (await response.json()) as T;
+    // Check if response has content
+    const contentLength = response.headers.get("content-length");
+    const contentType = response.headers.get("content-type");
+
+    if (contentLength === "0" || !contentType?.includes("json")) {
+      // No content or not JSON, return empty response for successful operations
+      return {} as T;
+    }
+
+    try {
+      return (await response.json()) as T;
+    } catch {
+      console.error(`Failed to parse success response as JSON`);
+      return {} as T;
+    }
   }
 
   status() {
@@ -100,16 +119,26 @@ export class Obsidian {
     targetDelimiter,
     contentType,
   }: PatchActiveOptions) {
+    const headers: Record<string, string> = {
+      Operation: operation,
+      "Target-Type": targetType,
+      Target: this.processTarget(target, targetType),
+      "Content-Type": contentType || "text/markdown",
+    };
+
+    if (trimTargetWhitespace !== undefined) {
+      headers["Trim-Target-Whitespace"] = trimTargetWhitespace.toString();
+    }
+
+    if (targetDelimiter !== undefined) {
+      headers["Target-Delimiter"] = targetDelimiter;
+    } else {
+      headers["Target-Delimiter"] = "::";
+    }
+
     return this.fetch<void>("/active/", {
       method: "PATCH",
-      headers: {
-        Operation: operation,
-        "Target-Type": targetType,
-        Target: target,
-        ...(trimTargetWhitespace && { "Trim-Target-Whitespace": "true" }),
-        ...(targetDelimiter && { "Target-Delimiter": targetDelimiter }),
-        ...(contentType && { "Content-Type": contentType }),
-      },
+      headers,
       body: content,
     });
   }
@@ -143,7 +172,10 @@ export class Obsidian {
   openFile({
     filename,
     newLeaf,
-  }: { filename: string; newLeaf?: boolean | null }) {
+  }: {
+    filename: string;
+    newLeaf?: boolean | null;
+  }) {
     const qs = newLeaf ? "?newLeaf=true" : "";
     return this.fetch<void>(`/open/${sanitizeAndEncodePath(filename)}${qs}`, {
       method: "POST",
@@ -173,16 +205,26 @@ export class Obsidian {
     targetDelimiter,
     contentType,
   }: PatchPeriodOptions) {
+    const headers: Record<string, string> = {
+      Operation: operation,
+      "Target-Type": targetType,
+      Target: this.processTarget(target, targetType),
+      "Content-Type": contentType || "text/markdown",
+    };
+
+    if (trimTargetWhitespace !== undefined) {
+      headers["Trim-Target-Whitespace"] = trimTargetWhitespace.toString();
+    }
+
+    if (targetDelimiter !== undefined) {
+      headers["Target-Delimiter"] = targetDelimiter;
+    } else {
+      headers["Target-Delimiter"] = "::";
+    }
+
     return this.fetch<void>(`/periodic/${period}/`, {
       method: "PATCH",
-      headers: {
-        Operation: operation,
-        "Target-Type": targetType,
-        Target: target,
-        ...(trimTargetWhitespace && { "Trim-Target-Whitespace": "true" }),
-        ...(targetDelimiter && { "Target-Delimiter": targetDelimiter }),
-        ...(contentType && { "Content-Type": contentType }),
-      },
+      headers,
       body: content,
     });
   }
@@ -222,7 +264,10 @@ export class Obsidian {
   simpleSearch({
     query,
     contextLength,
-  }: { query: string; contextLength?: number }) {
+  }: {
+    query: string;
+    contextLength?: number;
+  }) {
     const params = new URLSearchParams({
       query,
       contextLength: contextLength?.toString() || "100",
@@ -259,6 +304,15 @@ export class Obsidian {
     );
   }
 
+  private processTarget(target: string, targetType: string): string {
+    if (targetType === "heading") {
+      // Remove leading # symbols if present
+      const cleanTarget = target.replace(/^#+\s*/, "");
+      return cleanTarget;
+    }
+    return target;
+  }
+
   patchFile({
     filename,
     operation,
@@ -269,16 +323,26 @@ export class Obsidian {
     targetDelimiter,
     contentType,
   }: PatchFileOptions) {
+    const headers: Record<string, string> = {
+      Operation: operation,
+      "Target-Type": targetType,
+      Target: this.processTarget(target, targetType),
+      "Content-Type": contentType || "text/markdown",
+    };
+
+    if (trimTargetWhitespace !== undefined) {
+      headers["Trim-Target-Whitespace"] = trimTargetWhitespace.toString();
+    }
+
+    if (targetDelimiter !== undefined) {
+      headers["Target-Delimiter"] = targetDelimiter;
+    } else {
+      headers["Target-Delimiter"] = "::";
+    }
+
     return this.fetch<void>(`/vault/${sanitizeAndEncodePath(filename)}`, {
       method: "PATCH",
-      headers: {
-        Operation: operation,
-        "Target-Type": targetType,
-        Target: target,
-        ...(trimTargetWhitespace && { "Trim-Target-Whitespace": "true" }),
-        ...(targetDelimiter && { "Target-Delimiter": targetDelimiter }),
-        ...(contentType && { "Content-Type": contentType }),
-      },
+      headers,
       body: content,
     });
   }
