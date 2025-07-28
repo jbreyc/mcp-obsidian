@@ -1,6 +1,6 @@
 {
-  "name": "@fazer-ai/mcp-obsidian",
-  "version": "1.1.1",
+  "name": "@jbreyc/mcp-obsidian",
+  "version": "1.0.0",
   "module": "src/index.ts",
   "main": "dist/index.js",
   "bin": "dist/index.js",
@@ -11,7 +11,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fazer-ai/mcp-obsidian"
+    "url": "https://github.com/jbreyc/mcp-obsidian"
   },
   "publishConfig": {
     "access": "public"
@@ -21,24 +21,31 @@
     "mcp-obsidian",
     "modelcontextprotocol",
     "claude",
-    "obsidian",
-    "fazer-ai"
+    "obsidian"
   ],
   "scripts": {
     "dev": "bun run --watch src/index.ts",
     "build": "bun build src/index.ts --target node --outdir=dist",
-    "lint": "bun biome check",
-    "format": "bun biome check --write",
-    "prepublishOnly": "bun run build"
+    "lint": "bun biome check src/ *.js",
+    "format": "bun biome check --write src/ *.js",
+    "prepublishOnly": "bun run build",
+    "test:api": "node test-api.js",
+    "test:api:nested": "node test-nested.js",
+    "test:build": "node test-build.js",
+    "test:mcp": "node test-mcp-server.js",
+    "test:deps": "node check-updates.js",
+    "test:all": "node run-tests.js",
+    "check-updates": "node check-updates.js"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
-    "@types/bun": "latest"
+    "@biomejs/biome": "^2.1.2",
+    "@types/bun": "latest",
+    "undici": "^7.12.0"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.2"
+    "@modelcontextprotocol/sdk": "^1.17.0"
   }
 }

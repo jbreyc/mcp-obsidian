@@ -1,3 +1,6 @@
+---
+updated: 2025-06-20 14:39
+---
 # MCP server for Obsidian (TypeScript + Bun)
 
 [![NPM Version](https://img.shields.io/npm/v/%40fazer-ai%2Fmcp-obsidian)](https://www.npmjs.com/package/@fazer-ai/mcp-obsidian)
@@ -38,6 +41,15 @@
 | **obsidian_put_file** | Creates a new file or replaces the entire body of an existing file |
 
 *See Obsidian's [Local REST API specifications](https://coddingtonbear.github.io/obsidian-local-rest-api) for more details.*
+
+### Important Notes for API Clients
+
+**Path Encoding**: When using the Local REST API directly (outside of this MCP server), do **NOT** URL-encode file paths. The server handles all necessary encoding internally. Paths should be sent as-is:
+
+✅ **Correct**: `GET /vault/00 inbox/my document.md`  
+❌ **Incorrect**: `GET /vault/00%20inbox%2Fmy%20document.md` (double encoding will cause failures)
+
+**PATCH Operations**: There are known issues with PATCH operations that may fail with `invalid-target` errors. This is a limitation of the current REST API implementation.
 
 ---
 
@@ -153,4 +165,4 @@ Open the URL it prints to step through requests (usually http://localhost:6274),
 
 ## License
 
-MIT – see [LICENSE](LICENSE).
+MIT – see [license](98%20archive/mcp-obsidian/code/node_modules/ms/license.md).
