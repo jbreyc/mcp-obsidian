@@ -126,16 +126,20 @@ Initial content for testing the API functionality.
       return;
     }
 
-    if (readResponse.ok) {      
+    if (readResponse.ok) {
       try {
         const fileData = await readResponse.json();
-        
+
         // Verify content contains expected elements
-        if (fileData.content && fileData.content.includes("Main Heading")) {
+        if (fileData.content?.includes("Main Heading")) {
           logSuccess("Test document read successfully");
         } else {
-          logError("File content verification failed - missing expected content");
-          console.log(`❌ File data content: ${JSON.stringify(fileData, null, 2)}`);
+          logError(
+            "File content verification failed - missing expected content",
+          );
+          console.log(
+            `❌ File data content: ${JSON.stringify(fileData, null, 2)}`,
+          );
           testFailed = true;
           return;
         }
