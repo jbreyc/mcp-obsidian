@@ -17,10 +17,9 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 
 # dotenv environment variable files
 .env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+.env.development
+.env.production
+.env.example
 
 # caches
 .eslintcache
@@ -32,4 +31,12 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 *.code-workspace
 
 # Finder (MacOS) folder config
-.DS_Store
+.DS_Storecerts/
+*.pem
+*.key
+
+
+# MD files
+CLAUDE.md
+HTTP_TRANSPORT_IMPLEMENTATION_PLAN.md
+DEPLOYMENT.md

@@ -1,6 +1,6 @@
 {
   "name": "@jbreyc/mcp-obsidian",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "module": "src/index.ts",
   "main": "dist/index.js",
   "bin": "dist/index.js",
@@ -11,8 +11,16 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jbreyc/mcp-obsidian"
+    "url": "git+https://github.com/jbreyc/mcp-obsidian.git"
   },
+  "homepage": "https://github.com/jbreyc/mcp-obsidian#readme",
+  "bugs": {
+    "url": "https://github.com/jbreyc/mcp-obsidian/issues"
+  },
+  "author": "jbreyc",
+  "contributors": [
+    "Markus Pfundstein (original author)"
+  ],
   "publishConfig": {
     "access": "public"
   },
@@ -21,31 +29,33 @@
     "mcp-obsidian",
     "modelcontextprotocol",
     "claude",
-    "obsidian"
+    "obsidian",
+    "http",
+    "https",
+    "docker",
+    "transport"
   ],
   "scripts": {
     "dev": "bun run --watch src/index.ts",
     "build": "bun build src/index.ts --target node --outdir=dist",
-    "lint": "bun biome check src/ *.js",
-    "format": "bun biome check --write src/ *.js",
-    "prepublishOnly": "bun run build",
-    "test:api": "node test-api.js",
-    "test:api:nested": "node test-nested.js",
-    "test:build": "node test-build.js",
-    "test:mcp": "node test-mcp-server.js",
-    "test:deps": "node check-updates.js",
-    "test:all": "node run-tests.js",
-    "check-updates": "node check-updates.js"
+    "lint": "bun biome check src/ test/",
+    "format": "bun biome check --write src/ test/",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "prepublishOnly": "bun run build"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.1.3",
     "@types/bun": "latest",
+    "@types/express": "^5.0.3",
+    "@types/node": "^20.0.0",
     "undici": "^7.13.0"
   },
   "peerDependencies": {
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.1"
+    "@modelcontextprotocol/sdk": "^1.17.1",
+    "express": "^5.1.0"
   }
 }
