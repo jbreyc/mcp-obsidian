@@ -1,0 +1,44 @@
+services:
+  # HTTP mode - web server on port 4000 (development)
+  mcp-obsidian-http:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mcp-obsidian-http
+    container_name: mcp-obsidian-http
+    ports:
+      - "${MCP_HTTP_PORT:-4000}:${MCP_HTTP_PORT:-4000}"
+    environment:
+      MCP_TRANSPORT: http
+      MCP_HTTP_PORT: ${MCP_HTTP_PORT:-4000}
+      OBSIDIAN_API_KEY: ${OBSIDIAN_API_KEY}
+      OBSIDIAN_HOST: ${OBSIDIAN_HOST:-host.docker.internal}
+      OBSIDIAN_PROTOCOL: ${OBSIDIAN_PROTOCOL:-http}
+      OBSIDIAN_PORT: ${OBSIDIAN_PORT:-27123}
+    profiles:
+      - http
+    restart: unless-stopped
+
+  # HTTPS mode - secure web server on port 4443 (production)
+  mcp-obsidian-https:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: mcp-obsidian-https
+    container_name: mcp-obsidian-https
+    ports:
+      - "${MCP_HTTPS_PORT:-4443}:${MCP_HTTPS_PORT:-4443}"
+    environment:
+      MCP_TRANSPORT: https
+      MCP_HTTPS_PORT: ${MCP_HTTPS_PORT:-4443}
+      MCP_SSL_CERT: /certs/cert.pem
+      MCP_SSL_KEY: /certs/key.pem
+      OBSIDIAN_API_KEY: ${OBSIDIAN_API_KEY}
+      OBSIDIAN_HOST: ${OBSIDIAN_HOST:-host.docker.internal}
+      OBSIDIAN_PROTOCOL: ${OBSIDIAN_PROTOCOL:-https}
+      OBSIDIAN_PORT: ${OBSIDIAN_PORT:-27124}
+    volumes:
+      - ${SSL_CERTS_PATH:-./certs}:/certs:ro
+    profiles:
+      - https
+    restart: unless-stopped

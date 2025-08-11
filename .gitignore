@@ -19,7 +19,9 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 .env
 .env.development
 .env.production
-.env.example
+
+# local docker configuration
+docker-compose.yml
 
 # caches
 .eslintcache

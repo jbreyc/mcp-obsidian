@@ -3,15 +3,13 @@ updated: 2025-06-20 14:39
 ---
 # MCP server for Obsidian (TypeScript + Bun)
 
-[![NPM Version](https://img.shields.io/npm/v/%40jbreyc%2Fmcp-obsidian)](https://www.npmjs.com/package/@jbreyc/mcp-obsidian)
-
 > A Model-Context-Protocol (MCP) server that lets Claude (or any MCP-compatible LLM) interact with your Obsidian vault through the [**Local REST API**](https://github.com/coddingtonbear/obsidian-local-rest-api) community plugin – written in **TypeScript** and runnable with **bunx**.
 >
 > This is an enhanced fork of [@fazer-ai/mcp-obsidian](https://github.com/fazer-ai/mcp-obsidian) with added support for HTTP/HTTPS transport modes and Docker deployment.
 
 ---
 
-## ✨ Components
+## 🛠️ Components
 
 ### Tools
 
@@ -44,76 +42,15 @@ updated: 2025-06-20 14:39
 
 *See Obsidian's [Local REST API specifications](https://coddingtonbear.github.io/obsidian-local-rest-api) for more details.*
 
-### Important Notes for API Clients
-
-**Path Encoding**: When using the Local REST API directly (outside of this MCP server), do **NOT** URL-encode file paths. The server handles all necessary encoding internally. Paths should be sent as-is:
-
-✅ **Correct**: `GET /vault/00 inbox/my document.md`  
-❌ **Incorrect**: `GET /vault/00%20inbox%2Fmy%20document.md` (double encoding will cause failures)
-
-**PATCH Operations**: There are known issues with PATCH operations that may fail with `invalid-target` errors. This is a limitation of the current REST API implementation.
-
 ---
 
-### Example prompts
-
-```text
-# Summarize the latest “architecture call” note
-# (Claude will transparently call list_files_in_vault → get_file_contents)
-Get the contents of the last “architecture call” note and summarize them.
-
-# Find all mentions of Cosmos DB
-Search for all files where “Azure CosmosDb” is mentioned and explain the context briefly.
-
-# Create a summary note
-Summarize yesterday’s meeting and save it as “summaries/2025-04-24-meeting.md”. Add a short intro suitable for e-mail.
-```
-
----
-
-## 🚀 Transport Modes
+## 🚝 Transport Modes
 
 This server supports three transport modes:
 
 1. **stdio** (default) - Direct process communication for Claude Desktop
 2. **HTTP** - Web server on port 4000 for development
 3. **HTTPS** - Secure web server on port 4443 for production
-
-### Quick Start
-
-#### Claude Desktop (stdio mode)
-```jsonc
-// claude_desktop_config.json
-{
-  "mcpServers": {
-    "@jbreyc/mcp-obsidian": {
-      "command": "bunx",
-      "args": ["@jbreyc/mcp-obsidian@latest"],
-      "env": {
-        "OBSIDIAN_API_KEY": "your-obsidian-api-key"
-      }
-    }
-  }
-}
-```
-
-#### Docker Deployment (HTTP/HTTPS)
-```bash
-# Clone and configure
-git clone https://github.com/jbreyc/mcp-obsidian
-cd mcp-obsidian
-cp .env.example .env
-# Edit .env with your OBSIDIAN_API_KEY
-
-# HTTP mode (development)
-docker compose --profile http up --build
-
-# HTTPS mode (production)
-./scripts/generate-dev-cert.sh  # Generate certificates
-docker compose --profile https up --build
-```
-
-See [Docker Deployment Guide](docs/docker-deployment.md) for detailed instructions.
 
 ## ⚙️ Configuration
 
@@ -127,9 +64,9 @@ There are two ways to pass the Obsidian API key to the server:
 // claude_desktop_config.json
 {
   "mcpServers": {
-    "@jbreyc/mcp-obsidian": {
-      "command": "bunx",
-      "args": ["@jbreyc/mcp-obsidian@latest"],
+    "mcp-obsidian": {
+      "command": "bun",
+      "args": ["/path/to/mcp-obsidian/src/index.ts"],
       "env": {
         "OBSIDIAN_API_KEY": "your-obsidian-api-key"
       }
@@ -137,9 +74,6 @@ There are two ways to pass the Obsidian API key to the server:
   }
 }
 ```
-
->[!NOTE]
-> Use `@jbreyc/mcp-obsidian@latest` to ensure you always run the most up to date version of the server.
 
 2. Alternatively, you can use an **`.env` file**. Place the key in the `.env` you created above. Note it must be placed in the working directory where the MCP server is running.
 
@@ -147,69 +81,6 @@ There are two ways to pass the Obsidian API key to the server:
 ### Environment variables
 
 You can use the `.env.example` file as reference to create your own `.env` file.
-
-```bash
-# Required
-OBSIDIAN_API_KEY=           # From Local REST API plugin settings
-
-# Optional (with defaults)
-MCP_TRANSPORT=              # stdio (default), http, or https
-OBSIDIAN_PROTOCOL=http      # http or https
-OBSIDIAN_HOST=localhost     # Obsidian host
-OBSIDIAN_PORT=27123         # Local REST API port
-
-# Required for HTTP mode
-MCP_HTTP_PORT=4000          # HTTP server port
-
-# Required for HTTPS mode  
-MCP_HTTPS_PORT=4443         # HTTPS server port
-MCP_SSL_CERT=               # Path to certificate file
-MCP_SSL_KEY=                # Path to private key file
-```
-
----
-
-## 🛠 Development
-
-### Running local version on Claude Desktop
-
-After cloning this repo, you can update Claude's config to run your local version of the server instead of pulling from npm.
-This is useful for quickly testing changes before publishing.
-
->[!NOTE]
->Keep in mind any changes you make on the code will only take effect after restarting the Claude Desktop app.
-
-1. Clone this repo and run `bun install` to install dependencies.
-1. Update your `claude_desktop_config.json` to point to your local version of the server:
-
-```jsonc
-// claude_desktop_config.json
-{
-  "mcpServers": {
-    "@jbreyc/mcp-obsidian": {
-      "command": "bun",
-      "args": ["/path/to/repo/src/index.ts"],
-      "env": {
-        "OBSIDIAN_API_KEY": "your-obsidian-api-key"
-      }
-    }
-  }
-}
-```
-
->[!IMPORTANT]
->Note we use `bun` instead of `bunx` here.
-
-### Debugging
-
-MCP servers talk over **stdio**, so normal debuggers aren’t helpful.  
-Use the **[MCP Inspector](https://github.com/modelcontextprotocol/inspector)**:
-
-```bash
-npx @modelcontextprotocol/inspector bun /path/to/repo/src/index.ts
-```
-
-Open the URL it prints to step through requests (usually http://localhost:6274), inspect tool calls, and watch logs in real time.
 
 ---
 
@@ -222,19 +93,41 @@ For production deployments, use Docker with HTTP/HTTPS transport:
 docker build -t mcp-obsidian .
 
 # Run with docker-compose
-docker compose --profile http up   # HTTP mode
-docker compose --profile https up  # HTTPS mode
+docker compose --profile http up -d   # HTTP mode
+docker compose --profile https up -d  # HTTPS mode
 ```
 
-See [Docker Deployment Guide](docs/docker-deployment.md) for complete instructions including SSL certificate setup.
+### SSL Certificates (HTTPS mode)
 
-## 📦 Publishing
+For HTTPS mode, generate certificates:
+```bash
+# Development certificates
+./scripts/generate-dev-cert.sh
 
-1. Update the version in `package.json`.
-1. Create GitHub release.
-1. Run `npm publish`.
+# Or use openssl directly
+mkdir -p certs
+openssl req -x509 -newkey rsa:4096 -keyout certs/key.pem -out certs/cert.pem \
+  -days 365 -nodes -subj "/CN=localhost"
+```
 
----
+### Docker Troubleshooting
+
+**Connection to Obsidian fails:**
+- Use `OBSIDIAN_HOST=host.docker.internal` in your `.env` file
+- On Linux, you may need `OBSIDIAN_HOST=172.17.0.1`
+
+**Port already in use:**
+```bash
+# Change external port
+HTTP_EXTERNAL_PORT=3001 docker compose --profile http up
+```
+
+**Check container health:**
+```bash
+docker compose ps
+curl http://localhost:4000/health     # HTTP mode
+curl -k https://localhost:4443/health # HTTPS mode
+```
 
 ## License
 
