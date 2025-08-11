@@ -45,7 +45,7 @@ export function registerTools(server: McpServer, config: Config) {
 
   server.tool(
     "obsidian_patch_active",
-    "PATCH content into the active file. IMPORTANT: The target (heading/block) is a LOCATOR ONLY - DO NOT include it in content! For headings use 'Title' not '# Title'. For nested headings use 'Parent::Child'. Content will be inserted UNDER the target. Use actual newlines, not \\n.",
+    "PATCH content into the active file. IMPORTANT: The target (heading/block) is a LOCATOR ONLY - DO NOT include it in content!\n\nFor headings:\n- Use 'Title' for any heading (no # symbols)\n- Use 'Parent::Child' for nested headings where Parent is the exact text of the parent heading and Child is the nested heading\n- The hierarchy path must include ALL parent headings from the target back to its root\n- Example: To target ### Subsection under ## Section under # Main, use: 'Main::Section::Subsection'\n- Example: To target ## Section at root level, use just: 'Section'\n- Heading hierarchy is determined by markdown heading levels (#, ##, ###, etc.), not visual appearance\n\nFor blocks: Use block ID without ^\nFor frontmatter: Use field name\n\nContent will be inserted UNDER the target. Use actual newlines, not \\n.",
     {
       operation: z
         .enum(["append", "prepend", "replace"])
@@ -192,7 +192,7 @@ export function registerTools(server: McpServer, config: Config) {
 
   server.tool(
     "obsidian_patch_periodic",
-    "PATCH content into a periodic note. IMPORTANT: The target (heading/block) is a LOCATOR ONLY - DO NOT include it in content! For headings use 'Title' not '# Title'. For nested headings use 'Parent::Child'. Content will be inserted UNDER the target. Use actual newlines, not \\n.",
+    "PATCH content into a periodic note. IMPORTANT: The target (heading/block) is a LOCATOR ONLY - DO NOT include it in content!\n\nFor headings:\n- Use 'Title' for any heading (no # symbols)\n- Use 'Parent::Child' for nested headings where Parent is the exact text of the parent heading and Child is the nested heading\n- The hierarchy path must include ALL parent headings from the target back to its root\n- Example: To target ### Subsection under ## Section under # Main, use: 'Main::Section::Subsection'\n- Example: To target ## Section at root level, use just: 'Section'\n- Heading hierarchy is determined by markdown heading levels (#, ##, ###, etc.), not visual appearance\n\nFor blocks: Use block ID without ^\nFor frontmatter: Use field name\n\nContent will be inserted UNDER the target. Use actual newlines, not \\n.",
     {
       period: z.enum(["daily", "weekly", "monthly", "quarterly", "yearly"]),
       operation: z
@@ -379,7 +379,7 @@ export function registerTools(server: McpServer, config: Config) {
 
   server.tool(
     "obsidian_patch_file",
-    "PATCH content into a vault file. IMPORTANT: The target (heading/block) is a LOCATOR ONLY - DO NOT include it in content! For headings use 'Title' not '# Title'. For nested headings use 'Parent::Child'. Content will be inserted UNDER the target. Use actual newlines, not \\n.",
+    "PATCH content into a vault file. IMPORTANT: The target (heading/block) is a LOCATOR ONLY - DO NOT include it in content!\n\nFor headings:\n- Use 'Title' for any heading (no # symbols)\n- Use 'Parent::Child' for nested headings where Parent is the exact text of the parent heading and Child is the nested heading\n- The hierarchy path must include ALL parent headings from the target back to its root\n- Example: To target ### Subsection under ## Section under # Main, use: 'Main::Section::Subsection'\n- Example: To target ## Section at root level, use just: 'Section'\n- Heading hierarchy is determined by markdown heading levels (#, ##, ###, etc.), not visual appearance\n\nFor blocks: Use block ID without ^\nFor frontmatter: Use field name\n\nContent will be inserted UNDER the target. Use actual newlines, not \\n.",
     {
       filename: z
         .string()
