@@ -1,11 +1,13 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "name": "mcp-obsidian",
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.17.1",
         "express": "^5.1.0",
+        "zod": "^3.23.8",
       },
       "devDependencies": {
         "@biomejs/biome": "^2.1.3",
