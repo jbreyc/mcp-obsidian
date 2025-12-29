@@ -456,4 +456,32 @@ export function registerTools(server: McpServer, config: Config) {
       };
     },
   );
+
+  server.tool(
+    "obsidian_get_pdf",
+    "Returns a PDF file from the vault as base64-encoded data that AI models can read visually. Use this for PDF documents instead of obsidian_get_file.",
+    {
+      filename: z
+        .string()
+        .describe(
+          "Path to PDF file relative to vault root (e.g. 'folder/document.pdf')",
+        ),
+    },
+    async (args) => {
+      const buffer = await obsidian.getFileBinary(args);
+      const base64 = buffer.toString("base64");
+      return {
+        content: [
+          {
+            type: "resource",
+            resource: {
+              uri: `file://${args.filename}`,
+              mimeType: "application/pdf",
+              blob: base64,
+            },
+          },
+        ],
+      };
+    },
+  );
 }

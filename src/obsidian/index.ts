@@ -362,4 +362,23 @@ export class Obsidian {
       body: content,
     });
   }
+
+  async getFileBinary({ filename }: { filename: string }): Promise<Buffer> {
+    const path = `/vault/${sanitizeAndEncodePath(filename)}`;
+    const url = `${this.baseUrl}${path}`;
+
+    console.error(`[GET BINARY] ${url}`);
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: this.headers,
+    });
+
+    if (!response.ok) {
+      const { statusText, status } = response;
+      throw new Error(`Error fetching file: ${statusText} (${status})`);
+    }
+
+    return Buffer.from(await response.arrayBuffer());
+  }
 }
